@@ -8,6 +8,7 @@ const register_userPath = "/register-user";
 
 exports.handler = async (event) => {
 	console.log("Request Event: ",event);
+	console.log("NO TENGO BOCA Y QUIERO GRITAR");
 	let response;
 	switch(true){
 		case event.httpMethod === 'GET' && event.path === healthPath:

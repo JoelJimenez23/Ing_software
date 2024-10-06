@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { DynamoDBClient, PutItemCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
 const client = new DynamoDBClient({region:'us-east-1'});
 
-async function  register_user(requestBody){
+async function register_user(requestBody){
 	const nombre = requestBody.nombre;
 	const apellido = requestBody.apellido;
 	const correo = requestBody.correo;
@@ -13,7 +13,10 @@ async function  register_user(requestBody){
 	if(!nombre || !apellido || !correo || !password){return util.buildResponse(401,{message:'Todos los campos son necesarios'});}
 	const DynamoUser = await getUserCorreo(correo);
 	console.log("correo info",DynamoUser);
-	if(DynamoUser.Item.correo.S == correo){console.log("401 correo existente");return util.buildResponse(401,{message:"Correo existente"});}
+	if(DynamoUser.Item){
+		console.log("401 correo existente");
+		return util.buildResponse(401,{message:"Correo existente"});
+	}
 	
 	const encryptedPW = bcrypt.hashSync(password,10);
 	const userInfo = {
@@ -23,7 +26,7 @@ async function  register_user(requestBody){
 		apellido: apellido
 	}
 	const saveUserResponse = await saveUser(userInfo);
-	//si no funciona
+	if(!saveUserResponse){return util.buildResponse(401,{message:"Error en la consulta"});}
 	console.log("saved",saveUserResponse);
 	return util.buildResponse(200,{response:saveUserResponse});
 }
