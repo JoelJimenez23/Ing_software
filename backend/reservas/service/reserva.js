@@ -5,9 +5,6 @@ const { DynamoDBClient,PutItemCommand,UpdateItemCommand } = require("@aws-sdk/cl
 const client = new DynamoDBClient({region:'us-east-1'});
 
 
-const accountSid = 'AC6883d978d89998a71c77b6506a4684c6';
-const authToken = '36453af5873a59b202b42b11e9c505ba';
-const client_twilio = require('twilio')(accountSid, authToken);
 
 async function reserva(requestBody) {
 	if(!requestBody.placa || !requestBody.telefono_driver || !requestBody.correo_user || !requestBody.token || !requestBody.correo_driver || !requestBody.inicio || !requestBody.llegada || !requestBody.metodo_de_pago || !requestBody.fecha || !requestBody.hora || !requestBody.precio || !requestBody.comentarios){
