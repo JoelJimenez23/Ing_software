@@ -1,45 +1,54 @@
 const util = require("../utils/util");
 const auth = require("../utils/auth");
 const uuid = require("uuid");
-const { DynamoDBClient,UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient,PutItemCommand,UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
+const client = new DynamoDBClient({region:'us-east-1'});
 
 
-async reserva(requestBody) {
-	if(!requestBody.correo_user || !requestBody.token || !requestBody.correo_driver || !requestBody.inicio || !requestBody.llegada || !requestBody.metodo_de_pago || !requestBody.tipo_carga || !requestBody.dimensiones || !requestBody.fecha || !requestBody.hora || !requestBody.precio || !requestBody.comentarios){
+const accountSid = 'AC6883d978d89998a71c77b6506a4684c6';
+const authToken = '36453af5873a59b202b42b11e9c505ba';
+const client_twilio = require('twilio')(accountSid, authToken);
+
+async function reserva(requestBody) {
+	if(!requestBody.placa || !requestBody.telefono_driver || !requestBody.correo_user || !requestBody.token || !requestBody.correo_driver || !requestBody.inicio || !requestBody.llegada || !requestBody.metodo_de_pago || !requestBody.fecha || !requestBody.hora || !requestBody.precio || !requestBody.comentarios){
 		return util.buildResponse(401,{response:"Faltan datos"});
 	}
 		
-	const verifyToken = auth.verifyToken(correo_user,token);
-	if(!verifyToken.verified){return util.buildResponse(401,{response:"token no coincide"});}
+	const correo_user = requestBody.correo_user;
+	const verifyToken = auth.verifyToken(correo_user,requestBody.token);
+	if(!verifyToken.verified){return util.buildResponse(401,{response:verifyToken.message});}
 
-	const correo_driver = requestBody.driver;
+	const correo_driver = requestBody.correo_driver;
 	const inicio = requestBody.inicio;
 	const llegada = requestBody.llegada;
 	const metodo_de_pago = requestBody.metodo_de_pago;
-	const tipo_carga = requestBody.tipo_carga;
-	const dimensiones = requestBody.dimensiones;
+	const placa = requestBody.placa;
 	const fecha = requestBody.fecha;
 	const hora = requestBody.hora;
 	const precio = requestBody.precio;
 	const comentarios = requestBody.comentarios;
-	
+	const telefono_driver = requestBody.telefono_driver;
+
 	reserva_info = {
-		id: uuid.uuid4(),
+		id: uuid.v4(),
 		correo_user: correo_user,
 		correo_driver : correo_driver,
 		inicio : inicio,
 		llegada : llegada,
 		metodo_de_pago : metodo_de_pago,
-		tipo_carga : tipo_carga,
-		dimensiones : dimensiones,
+		placa: placa,
 		fecha : fecha,
 		hora : hora,
 		precio : precio,
-		comentarios : comentarios
+		comentarios : comentarios,
+		telefono_driver: telefono_driver
 	}
+	console.log("Reserva info",reserva_info);
 
+	console.log("ANTES DE");
 	const putReservaResponse = await putReserva(reserva_info);
-	
+
+
 	return putReservaResponse;
 }
 
@@ -50,28 +59,23 @@ async function putReserva(reserva_info){
 			"id":{"S":reserva_info.id},
 			"correo_user":{"S":reserva_info.correo_user},
 			"correo_driver":{"S":reserva_info.correo_driver},
-			"incio":{"S":reserva_info.inicio},
+			"inicio":{"S":reserva_info.inicio},
 			"llegada":{"S":reserva_info.llegada},
 			"metodo_de_pago":{"S":reserva_info.metodo_de_pago},
-			"tipo_carga":{"S":reserva_info.tipo_carga},
-			"dimensiones":{
-				"M":{
-					"largo":{"S":reserva_info.dimensiones.largo},
-					"ancho":{"S":reserva_info.dimensiones.ancho},
-					"altura":{"S":reserva_info.dimensiones.altura}
-				}
-			},
+			"placa": {"S":reserva_info.placa},
 			"fecha":{"S":reserva_info.fecha},
 			"hora":{"S":reserva_info.hora},
 			"precio":{"S":reserva_info.precio},
-			"comentarios":{"S":reserva_info.comentarios}
-			"estado":{"S":"solicitada"}
-			"codigo":{"S":"temporal"}
+			"comentarios":{"S":reserva_info.comentarios},
+			"estado":{"S":"solicitada"},
+			"codigo":{"S":"temporal"},
+			"telefono_driver":{"S":reserva_info.telefono_driver}
 		}
 	}
-	const command = new UpdateItemCommand(input);
-	const response = await client.send();
-
+	console.log("TEST");
+	const command = new PutItemCommand(input);
+	const response = await client.send(command);
+	console.log("RESPONSEAAAAAAA:   ",response);
 	if(response.$metadata.httpStatusCode !== 200){
 		return util.buildResponse(503,{message:"Error del servidor.Porfavor intente luego.reserva"});
 	}
@@ -82,24 +86,23 @@ async function putReserva(reserva_info){
 		UpdateExpression:"ADD reservas :val",
 		ExpressionAttributeValues:{":val":{"SS":[reserva_info.id]}} 
 	};
-	const command1 = new UpdateItemCommand(input);
-	const response1 = await client.send(command);
+	const command1 = new UpdateItemCommand(input1);
+	const response1 = await client.send(command1);
 	if(response1.$metadata.httpStatusCode !== 200){
 		return util.buildResponse(503,{message:"Error del servidor.Porfavor intente luego.reserva id user"});
 	}
 
 	const input2 = {
-		TableName: "flete_driver",
+		TableName: "flete_drivers",
 		Key:{"correo":{"S":reserva_info.correo_driver}},
 		UpdateExpression:"ADD reservas :val",
 		ExpressionAttributeValues:{":val":{"SS":[reserva_info.id]}} 
 	};
-	const command2 = new UpdateItemCommand(input);
-	const response2 = await client.send(command);
+	const command2 = new UpdateItemCommand(input2);
+	const response2 = await client.send(command2);
 	if(response2.$metadata.httpStatusCode !== 200){
 		return util.buildResponse(503,{message:"Error del servidor.Porfavor intente luego.reserva id user"});
 	}
-	
 	return util.buildResponse(200,{message:"Reserva solicitada exitosamente"});
 }
 

@@ -15,7 +15,7 @@ async function register_user(requestBody){
 
 	const DynamoUser = await getUserCorreo(correo);
 	console.log("correo info",DynamoUser);
-	if(DynamoUser.Item){
+	if(DynamoUser.Item !== undefined){
 		console.log("401 correo existente");
 		return util.buildResponse(401,{message:"Correo existente"});
 	}
@@ -54,7 +54,7 @@ async function saveUser(userInfo){
 			"correo":{"S":userInfo.correo},
 			"password":{"S":userInfo.password},
 			"nombre":{"S":userInfo.nombre},
-			"apellido":{"S":userInfo.apellido}
+			"apellido":{"S":userInfo.apellido},
 			"telefono":{"S":userInfo.telefono},
 			"metodo_de_pago":{
 				"M":{

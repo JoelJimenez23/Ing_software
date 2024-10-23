@@ -1,27 +1,29 @@
-const util = require("../utils/util");
 const auth = require("../utils/auth");
-const {DynamoDBClient,ScanCommand} = require("@aws-sdk/client-dynamodb");
+const util = require("../utils/util");
+const bcrypt = require('bcryptjs');
+const { DynamoDBClient, GetItemCommand } = require("@aws-sdk/client-dynamodb");
 const client = new DynamoDBClient({region:'us-east-1'});
 
+async function get_vehiculo(requestBody){
+	const placa = requestBody.placa;
 
-async get_vehiculo(requestBody){
-	const parametro = requestBody.parametro;
-	const valor = requestBody.parametro;
-	const vehiculos = await GetVehiculos(parametro,valor);
-	return util.buildResponse(200,{response:vehiculos});
-}
-
-async function GetVehiculos(parametro,valor){
-	param = "#"+parametro;
-	prjexpr = param+", #nombre_conductor,#calificacion_promedio";
-	const input = {
-		TableName: 'flete_vehiculos',
-		ExpressionAttributeNames:{
-			param:"parametro"
-		},
-		ProjectExpression: prjexpr
+	if(!placa){
+		return util.buildResponse(401,{"message":"Todos los campos son necesarios"});
 	}
-	const command = new ScanCommand(input);
-	const response = await client.send(command);
-	return response.Items;
+	const vehiculo = await getVehiculo(placa);
+	console.log("vehiculo ",vehiculo);
+	return util.buildResponse(200,vehiculo);
 }
+
+async function getVehiculo(placa){
+	const input = {
+		TableName: "flete_vehiculos",
+		Key:{"placa":{"S":placa}},
+        AttributesToGet:["placa","telefono","calficacion_promedio","correo_conductor","dimensiones","nombre_conductor","tipo_carga","tipo_transporte"]
+	};
+	const command = new GetItemCommand(input);
+	const response = await client.send(command);
+	return response;
+}
+
+module.exports.get_vehiculo = get_vehiculo;

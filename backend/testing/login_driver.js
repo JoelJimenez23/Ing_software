@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const url_register  = "https://z9i523elr0.execute-api.us-east-1.amazonaws.com/dev/register";
+const url_register  = "https://z9i523elr0.execute-api.us-east-1.amazonaws.com/dev/login";
 
 const headers = {
 	'Content-Type':'application/json'
@@ -8,15 +8,12 @@ const headers = {
 
 async function test(){
 	const info = {
-		nombre:"tia",
-		apellido:"paola",
-		correo:"tia@paola.com",
-		password:"tia123",
-		telefono:"925472987"
+		correo:"joel@jimenez.com",
+		password:"joel123",
 	};
 	const json_data = {
 		httpMethod:"POST",
-		path:"/register-driver",
+		path:"/login-driver",
 		body: JSON.stringify(info)
 	}
 	const method = 'POST';

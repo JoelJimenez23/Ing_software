@@ -13,7 +13,7 @@ async function login_user(requestBody){
 	}
 	const DynamoUser = await getUser(correo);
 	console.log("user ",DynamoUser);
-	if(!DynamoUser.Item){return util.buildResponse(401,{message:"correo no registrado"});}
+	if(DynamoUser.Item === undefined){return util.buildResponse(401,{message:"correo no registrado"});}
 	if(!bcrypt.compareSync(password,DynamoUser.Item.password.S)){
 		return util.buildResponse(403,{message:"password incorrecta"});
 	}

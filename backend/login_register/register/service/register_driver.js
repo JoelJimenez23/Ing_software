@@ -14,9 +14,11 @@ async function register_driver(requestBody){
 	if(!nombre || !apellido || !correo || !password || !telefono){
 		return util.buildResponse(401,{message:'Todos los campos son necesarios'});
 	}
+	console.log("hola homero");
 	const DynamoDriver = await getDriverCorreo(correo);
 	console.log("correo info",DynamoDriver);
-	if(DynamoDriver.Item){
+	console.log(DynamoDriver.Item);
+	if(DynamoDriver.Item !== undefined){
 		console.log("401 correo existente");
 		return util.buildResponse(401,{message:"Correo existente"});
 	}

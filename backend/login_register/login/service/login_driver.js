@@ -13,7 +13,7 @@ async function login_driver(requestBody){
 	}
 	const DynamoDriver = await getDriver(correo);
 	console.log("driver ",DynamoDriver);
-	if(!DynamoDriver.Item){return util.buildResponse(401,{message:"correo no registrado"});}
+	if(DynamoDriver.Item === undefined){return util.buildResponse(401,{message:"correo no registrado"});}
 	if(!bcrypt.compareSync(password,DynamoDriver.Item.password.S)){
 		return util.buildResponse(403,{message:"password incorrecta"});
 	}

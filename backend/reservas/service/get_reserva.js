@@ -1,14 +1,9 @@
 const util = require("../utils/util");
 const auth = require("../utils/auth");
-const uuid = require("uuid");
-const { DynamoDBClient, GetItemCommand,ScanCommand} = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, GetItemCommand} = require("@aws-sdk/client-dynamodb");
+const client = new DynamoDBClient({region:'us-east-1'});
 
-
-//correo (usuario o driver)
-//tabla necesaria
-//flitro
-
-async get_reserva(requestBody){
+async function get_reserva(requestBody){
 	if(!requestBody.correo || !requestBody.tabla || !requestBody.filtro || !requestBody.token){
 		return util.buildResponse(401,{message:"Faltan datos"});
 	}
@@ -27,18 +22,19 @@ async get_reserva(requestBody){
 	}
 
 	const getReservaResponse = await getReserva(get_info);
-
+	return getReservaResponse;
 }
 
-async getReserva(get_info){
+async function getReserva(get_info){
 	const input = {
 		TableName:get_info.TableName,
-		Key:{"correo":"S":{get_info.correo}},
+		Key:{
+			"correo":{"S":get_info.correo}
+		},
 		AttributesToGet:["reservas"]
 	};
 	const command = new GetItemCommand(input);
 	const response = await client.send(command);
-
-	
-
+	return response;
 }
+module.exports.get_reserva = get_reserva;
