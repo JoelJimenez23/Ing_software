@@ -4,12 +4,11 @@ const { DynamoDBClient, GetItemCommand} = require("@aws-sdk/client-dynamodb");
 const client = new DynamoDBClient({region:'us-east-1'});
 
 async function get_reserva(requestBody){
-	if(!requestBody.correo || !requestBody.tabla || !requestBody.filtro || !requestBody.token){
+	if(!requestBody.correo || !requestBody.tabla || !requestBody.token){
 		return util.buildResponse(401,{message:"Faltan datos"});
 	}
 	const correo = requestBody.correo;
 	const TableName = requestBody.tabla;
-	const filtro = requestBody.filtro;
 	const token  = requestBody.token;
 
 	const verification = auth.verifyToken(correo,token);
@@ -17,8 +16,7 @@ async function get_reserva(requestBody){
 
 	get_info = {
 		correo: correo,
-		TableName: TableName,
-		filtro: filtro
+		TableName: TableName
 	}
 
 	const getReservaResponse = await getReserva(get_info);
