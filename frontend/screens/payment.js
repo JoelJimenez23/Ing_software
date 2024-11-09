@@ -4,9 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-const PaymentInfo = ({ navigation }) => {
-  const [selectedMethod, setSelectedMethod] = useState('visa1');
+const PaymentInfo = ({ route,navigation }) => {
+  const { user_data } = route.params;
+	console.log(user_data);
 
+	const [selectedMethod, setSelectedMethod] = useState('visa1');
   const paymentMethods = [
     { id: 'visa1', type: 'VISA', lastDigits: '1234', expiry: '01/2029' },
     { id: 'visa2', type: 'VISA', lastDigits: '1234', expiry: '01/2029' },

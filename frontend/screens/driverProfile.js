@@ -5,7 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 
 const DriverProfile = ({ navigation, route }) => {
-  const { driver } = route.params;
+  const { vehiculo_seleccionado } = route.params;
+	console.log(vehiculo_seleccionado);
+
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
@@ -17,13 +20,12 @@ const DriverProfile = ({ navigation, route }) => {
 
       <View style={styles.profileContainer}>
         <View style={styles.profileDetails}>
-          <Text style={styles.driverName}>{driver.name}</Text>
+          <Text style={styles.driverName}>{vehiculo_seleccionado.nombre_conductor}</Text>
           <View style={styles.ratingContainer}>
             <Ionicons name="star" size={16} color="white" />
-            <Text style={styles.ratingText}>{driver.rating.toFixed(2)}</Text>
+            <Text style={styles.ratingText}>{ vehiculo_seleccionado.calificacion_promedio?.S || "nose" }</Text>
           </View>
         </View>
-        <Image source={driver.image} style={styles.driverImage} />
       </View>
 
       <View style={styles.buttonsContainer}>
@@ -41,19 +43,19 @@ const DriverProfile = ({ navigation, route }) => {
         <Text style={styles.infoTitle}>Datos Generales</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Placa</Text>
-          <Text style={styles.infoValue}>{driver.plate}</Text>
+          <Text style={styles.infoValue}>{vehiculo_seleccionado.placa}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Vehiculo</Text>
-          <Text style={styles.infoValue}>{driver.vehicle}</Text>
+          <Text style={styles.infoValue}>{vehiculo_seleccionado.tipo_transporte}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Dimensiones</Text>
-          <Text style={styles.infoValue}>{driver.dimensions}</Text>
+          <Text style={styles.infoValue}>{vehiculo_seleccionado.dimensiones}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Disponibilidad</Text>
-          <Text style={styles.infoValue}>{driver.availability}</Text>
+          <Text style={styles.infoValue}>{"FINO"}</Text>
         </View>
       </View>
     </SafeAreaView>

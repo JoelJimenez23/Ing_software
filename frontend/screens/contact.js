@@ -67,8 +67,8 @@ const ContactScreen = ({ navigation }) => {
 				headers:headers,
 				data:json_data
 			})
-			//const vehiculos = JSON.parse(response.data.body);
-			console.log("GET VEHICULOS P ",response.data);
+			const vehiculos = JSON.parse(response.data.body);
+			console.log("GET VEHICULOS P ",vehiculos);
 		} catch (error) {console.log(error);}
 	};
 		
@@ -77,13 +77,21 @@ const ContactScreen = ({ navigation }) => {
       get_vehiculos_p();   
     }, [])  
   );
-
-
+	
+	const vehiculo_seleccionado = { //simula la seleccion de un vehiculo obtenido de la api
+		placa : "AJA",
+		correo_conductor: "pepito@gmail.com",
+		dimensiones: "1-2-3",
+		nombre_conductor: "Ramiro",
+		telefono:"1234",
+		tipo_carga:"todito",
+		tipo_transporte:"van"
+	}
 
 
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('DriverProfile', { driver: item })}>
+    <TouchableOpacity onPress={() => navigation.navigate('DriverProfile', { vehiculo_seleccionado: vehiculo_seleccionado })}>
       <View style={styles.itemContainer}>
         <Image source={item.image} style={styles.driverImage} />
         <Text style={styles.vehicleType}>{item.vehicle}</Text>

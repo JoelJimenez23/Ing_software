@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,6 +10,61 @@ const AdvReservation = ({ navigation }) => {
   const [destination, setDestination] = useState(''); 
   const [date, setDate] = useState('');
   const [time, setTime] = useState(''); 
+
+	const [placa, setPlaca] = useState();
+	const [telefono_driver,setTelefono_driver] = useState();
+	const [user,setCorreo_user] = useState();
+	const [token,setToken] = useState();
+	const [correo_driver,setCorreo_driver] = useState();
+	const [inicio,setInicio] = useState();
+	const [llegada,setLlegada] = useState();
+	const [metodo_de_pago,setMetodo_de_pago] = useState();
+	const [fecha,setFecha] = useState();
+	const [hora,setHora] = useState();
+	const [precio,setPrecio] = useState();
+	const [comentarios,setComentarios] = useState();
+
+	const test = () => {
+		(async () => {
+			const useR = await getUser();
+			const tokeN = await getToken();
+			setUser(useR);
+			setToken(tokeN);
+		})();
+	} 
+	useEffect(() => {test();},[]);
+
+	const create_reservaHandler = async () => {
+		try {
+			const info = {
+				correo_user:user,
+				correo_driver:"",
+				telefono_driver:"",
+				inicio:inicio,
+				llegada:llegada,
+				metodo_de_pago:metodo_de_pago,
+				placa:placa,
+				fecha:fecha,
+				hora:hora,
+				precio:precio,
+				comentarios:comentarios,
+				token:token
+			}
+			const json_data = {
+				httpMethod:"POST",
+				path:"/reserva",
+				body: JSON.stringify(info)
+			}
+			const method = "POST"
+			const response =  await axios();
+			const reservadita = response;
+		} catch (error) { console.log(error); }
+
+	};
+
+
+
+
 
   return (
     <SafeAreaView style={styles.safeArea}>

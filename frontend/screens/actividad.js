@@ -1,12 +1,18 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import { View, Text, StyleSheet, Image, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import axios from "axios";
+import { getUser,getToken } from "../utils/Auth";
+import { useFocusEffect } from '@react-navigation/native';
+const url = "https://s1oxe0wq3c.execute-api.us-east-1.amazonaws.com/dev/get-mis-viajes";
 const vehicles = {
   Camion: require('../assets/Camion.png'),
   Flete: require('../assets/Flete.png'),
   Van: require('../assets/Van.png'),
   Furgoneta: require('../assets/Furgoneta.png'),
+};
+const headers = {
+	"Content-Type":"application/json"
 };
 
 const trips = [
@@ -16,6 +22,60 @@ const trips = [
 ];
 
 const Activity = ({ navigation }) => {
+	const [user,setUser] = useState();
+	const [token,setToken] = useState();
+	const test = () => {
+  	(async () => {
+    	const useR = await getUser();
+    	const tokeN = await getToken();
+    	console.log("User:", useR);
+    	console.log("Token:", tokeN);
+    	setUser(useR);
+    	setToken(tokeN);
+    	setLoading(false);  // Cuando se han establecido, podemos dejar de mostrar el "loading".
+  	})();
+	};
+
+	useEffect(() => {
+  	test();  // Solo se ejecuta una vez
+	}, []);
+
+
+	const getViajes = async () => {
+		console.log("YO HAGO");
+		try {
+			const info = {
+				correo:user,
+				rol:"user",
+				parametro:"-",
+				valor:"-",
+				token:token
+			}
+			const json_data = {
+				httpMethod:"GET",
+				path:"/get-mis-viajes",
+				body:JSON.stringify(info)
+			}
+			const method = "POST";
+
+			console.log("REAL");
+			response = await axios({
+				method:method,
+				url:url,
+				headers:headers,
+				data:json_data
+			})
+			const viajecitos = JSON.parse(response.data.body).response;
+			console.log(viajecitos);
+
+		} catch(error){ console.log(error); }
+
+	};
+
+	useEffect(() => {
+		if(user && token){getViajes();}
+	},[user,token]);
+
   const renderTrip = ({ item }) => (
     <View style={styles.tripContainer}>
       <View style={styles.tripInfo}>
