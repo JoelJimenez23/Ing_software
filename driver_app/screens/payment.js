@@ -1,63 +1,85 @@
 import React, { useState,useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions, FlatList, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import axios from 'axios';
 const { width } = Dimensions.get('window');
 
-const PaymentInfo = ({ route ,navigation }) => {
+import {getUser,getToken} from '../utils/Auth';
+const headers = {
+	"Content-Type":"application/json"
+};
+
+const PaymentInfo = ({ navigation,route }) => {
 	const { user_data } = route.params;
-	const [formattedPayments,setformattedPayments] = useState([]);
+	const [formattedPayments,setformattedPayments] = useState();
+  const [efectivo,setEfectivo] = useState();
+  const [yape,setYape] = useState();
+  const [plin,setPlin] = useState();
+  const [user,setUser] = useState();
+  const [token,setToken] = useState();
 	
+	const test = () => {
+		(async () => {
+			const useR = await getUser();
+			const tokeN = await getToken();
+			setUser(useR);
+			setToken(tokeN);
+		})();
+	}
+	useEffect(() => {test();},[]);
+
+
 	useEffect(() => {
 		if(user_data){  
-			setformattedPayments(user_data?.metodo_de_pago?.SS);
+      console.log("siguiente paso ",user_data)
+			setformattedPayments(user_data.metodo_de_pago?.M);
+      console.log("llorar ",user_data.metodo_de_pago?.M);
+      console.log("llorar ",user_data.metodo_de_pago?.M.efectivo?.S);
+      console.log("llorar ",user_data.metodo_de_pago?.M.yape?.S);
+      console.log("llorar ",user_data.metodo_de_pago?.M.plin?.S);
+
 			console.log(formattedPayments);
+      setEfectivo(user_data.metodo_de_pago?.M.efectivo?.S === "true");
+      setYape(user_data.metodo_de_pago?.M.yape?.S === "true");
+      setPlin(user_data.metodo_de_pago?.M.plin?.S === "true");
+      
+
+      console.log(formattedPayments)
+      console.log(efectivo)
+      console.log(yape)
+      console.log(plin)
+
 		}
 	},[user_data]);
 
-	
-	console.log(formattedPayments);
-  const [selectedMethod, setSelectedMethod] = useState('visa1');
-
-  const paymentMethods = [
-    { id: 'visa1', type: 'VISA', lastDigits: '1234', expiry: '01/2029' },
-    { id: 'visa2', type: 'VISA', lastDigits: '1234', expiry: '01/2029' },
-    { id: 'visa3', type: 'VISA', lastDigits: '1234', expiry: '01/2029' },
-    { id: 'cash', type: 'Efectivo' },
-  ];
-
-  const handleSelectMethod = (id) => {
-    setSelectedMethod(id);
-  };
-
-  const renderPaymentMethod = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.paymentMethodContainer,
-        selectedMethod === item.id && styles.selectedPaymentMethod,
-      ]}
-      onPress={() => handleSelectMethod(item.id)}
-    >
-      <View style={styles.paymentMethodInfo}>
-        {item.type === 'VISA' ? (
-          <Text style={styles.paymentType}>{item.type}</Text>
-        ) : (
-          <Ionicons name="cash-outline" size={26} color="#6B9AC4" style={styles.icon} />
-        )}
-        <View style={styles.paymentDetails}>
-          <Text style={[styles.paymentText, item.type === 'Efectivo' && styles.efectivoText]}>
-            {item.type === 'VISA' ? `**** ${item.lastDigits}` : 'Efectivo'}
-          </Text>
-          {item.expiry && <Text style={styles.paymentExpiry}>{item.expiry}</Text>}
-        </View>
-      </View>
-      <Ionicons
-        name={selectedMethod === item.id ? 'radio-button-on' : 'radio-button-off'}
-        size={20}
-        color="#6B9AC4"
-      />
-    </TouchableOpacity>
-  );
+  const savechanges = async () => {
+    const urlcito = "https://z9i523elr0.execute-api.us-east-1.amazonaws.com/dev/mod-payment";
+    try {
+      const info = {
+        correo:user,
+        token:token,
+        payment_info:{
+          efectivo:efectivo,
+          yape:yape,
+          plin:plin
+        },
+        tabla:"driver"
+      };
+      const json_data = {
+        httpMethod:"POST",
+        path:"/mod-payment",
+        body: JSON.stringify(info)
+      };
+      const method = "POST";
+      const response = await axios({
+        url:urlcito,
+        headers:headers,
+        method:method,
+        data:json_data
+      });
+      console.log(response);
+    } catch (error) { console.log(error);}
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -69,24 +91,96 @@ const PaymentInfo = ({ route ,navigation }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.paymentMethodsList}>
-        {formattedPayments.map((method) => (
-          <View key={method.id}>{renderPaymentMethod({ item: method })}</View>
-        ))}
-
-        <TouchableOpacity style={[styles.paymentMethodContainer, styles.addPaymentButton]} onPress={() => navigation.navigate('AddCreditCard')}>
-          <Ionicons name="add" size={28} color="#6B9AC4" style={styles.add}/>
-          <Text style={styles.addPaymentText}>Agregar Metodo de Pago</Text>
+   
+      <TouchableOpacity
+          style={[styles.paymentMethodContainer]}
+          onPress={() => setEfectivo((prevEfectivo) => !prevEfectivo)} // Cambia el estado de `plin` al opuesto
+        >
+          <View style={styles.paymentMethodInfo}>
+            <View style={styles.paymentDetails}>
+              <Text style={[styles.paymentText, styles.efectivoText]}>Efectivo</Text>
+            </View>
+          </View>
+          <Ionicons
+            name={efectivo ? 'radio-button-on' : 'radio-button-off'} // Cambia el icono según el valor de `plin`
+            size={20}
+            color="#6B9AC4"
+          />
         </TouchableOpacity>
+
+
+        <TouchableOpacity
+          style={[styles.paymentMethodContainer]}
+          onPress={() => setYape((prevYape) => !prevYape)} // Cambia el estado de `plin` al opuesto
+        >
+          <View style={styles.paymentMethodInfo}>
+            <View style={styles.paymentDetails}>
+              <Text style={[styles.paymentText, styles.efectivoText]}>Yape</Text>
+            </View>
+          </View>
+          <Ionicons
+            name={yape ? 'radio-button-on' : 'radio-button-off'} // Cambia el icono según el valor de `plin`
+            size={20}
+            color="#6B9AC4"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.paymentMethodContainer]}
+          onPress={() => setPlin((prevPlin) => !prevPlin)} // Cambia el estado de `plin` al opuesto
+        >
+          <View style={styles.paymentMethodInfo}>
+            <View style={styles.paymentDetails}>
+              <Text style={[styles.paymentText, styles.efectivoText]}>Plin</Text>
+            </View>
+          </View>
+          <Ionicons
+            name={plin ? 'radio-button-on' : 'radio-button-off'} // Cambia el icono según el valor de `plin`
+            size={20}
+            color="#6B9AC4"
+          />
+        </TouchableOpacity>
+
+
+
+        <View style={styles.footer}>
+          <TouchableOpacity
+            onPress={() => {
+              savechanges();
+            }}
+          >
+            <View style={styles.btn}>
+              <Text style={styles.btnText}>Reservas</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
       </ScrollView>
+
+
     </SafeAreaView>
   );
 };
 
-const PaymentItem = ({  })
-
-
 
 const styles = StyleSheet.create({
+  btn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    backgroundColor: '#007aff',
+    borderColor: '#007aff',
+  },
+  btnText: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: '600',
+    color: '#fff',
+  },
   safeArea: {
     flex: 1,
     backgroundColor: 'white',
@@ -102,6 +196,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 150,
     color: '#333',
+  },
+  footer: {
+    marginTop: 'auto',
+    paddingHorizontal: 16,
   },
   paymentMethodsList: {
     paddingHorizontal: 20,

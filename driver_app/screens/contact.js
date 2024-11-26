@@ -3,197 +3,164 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, SafeAreaView
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from "axios";
-const url = "https://h8019u59m4.execute-api.us-east-1.amazonaws.com/dev/get-vehiculos";
+import {getUser,getToken} from '../utils/Auth';
+const url = "https://h8019u59m4.execute-api.us-east-1.amazonaws.com/dev/get-vehiculo-conductor";
 const headers = {
 	"Content-Type":"application/json"
 };
 
 
-const exampleDrivers = [
-  { id: '1', name: 'Pedro Lopez', vehicle: 'Van', image: require('../assets/ConductorTemp.png'), rating: 4.5, plate: 'ABC123', dimensions: '4x2', availability: '9am - 6pm' },
-  { id: '2', name: 'Ramiro Tyson', vehicle: 'Camion', image: require('../assets/ConductorTemp.png'), rating: 4.8, plate: 'XYZ789', dimensions: '6x3', availability: '10am - 5pm' },
-  { id: '3', name: 'Carlos Perez', vehicle: 'Camion', image: require('../assets/ConductorTemp.png'), rating: 4.7, plate: 'LMN456', dimensions: '5x3', availability: '8am - 4pm' },
-  { id: '4', name: 'Diego Garcia', vehicle: 'Flete', image: require('../assets/ConductorTemp.png'), rating: 4.6, plate: 'OPQ123', dimensions: '6x2', availability: '7am - 3pm' },
-];
-
 const ContactScreen = ({ navigation }) => {
-	const [parametro,setParametro] = useState();
-	const [valor,setValor] = useState();
-	const [vehiculos,setVehiculos] = useState();
-
-	const get_vehiculos = async () => {
-		try {
-			const info = {
-				parametro:"tipo_transporte",
-				valor:"van"
-			}
-			const json_data = {
-				httpMethod:"GET",
-				path:"/get-vehiculos",
-				body: JSON.stringify(info)
-			}
-			const method = "POST";
-			response = await axios({
-				method:method,
-				url:url,
-				headers:headers,
-				data:json_data
-			})
-			//const vehiculos = JSON.parse(response.data.body);
-			console.log(response.data);
-		} catch (error) {console.log(error);}
-	};
-		
-  useFocusEffect(
-    React.useCallback(() => {
-      get_vehiculos();   
-    }, [])  
-  );
-
-	const get_vehiculos_p= async () => {
-		try {
-			const info = {
-				placa:"AJA",
-			}
-			const json_data = {
-				httpMethod:"GET",
-				path:"/get-vehiculo",
-				body: JSON.stringify(info)
-			}
-			const method = "POST";
-			response = await axios({
-				method:method,
-				url:url,
-				headers:headers,
-				data:json_data
-			})
-			const vehiculos = JSON.parse(response.data.body);
-			console.log("GET VEHICULOS P ",vehiculos);
-		} catch (error) {console.log(error);}
-	};
-		
-  useFocusEffect(
-    React.useCallback(() => {
-      get_vehiculos_p();   
-    }, [])  
-  );
-	
-	const vehiculo_seleccionado = { //simula la seleccion de un vehiculo obtenido de la api
-		placa : "AJA",
-		correo_conductor: "pepito@gmail.com",
-		dimensiones: "1-2-3",
-		nombre_conductor: "Ramiro",
-		telefono:"1234",
-		tipo_carga:"todito",
-		tipo_transporte:"van"
+	const [user,setUser] = useState("");
+	const [token,setToken] = useState("");
+  const [vehiculitos,setVehiculitos] = useState([]);
+	const test = () => {
+		(async () => {
+			const useR = await getUser();
+			const tokeN = await getToken();
+			setUser(useR);
+			setToken(tokeN);
+		})();
 	}
+	useEffect(() => {test();},[]);
 
-
-
-  const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('DriverProfile', { vehiculo_seleccionado: vehiculo_seleccionado })}>
-      <View style={styles.itemContainer}>
-        <Image source={item.image} style={styles.driverImage} />
-        <Text style={styles.vehicleType}>{item.vehicle}</Text>
-        <Text style={styles.driverName}>{item.name}</Text>
-      </View>
-    </TouchableOpacity>
+	const vehiculos = async () => {
+		try {
+			const info = {
+				correo:user,
+				token : token
+			};
+			const json_data = {
+				httpMethod:"GET",
+				path:"/get-vehiculo-conductor",
+				body: JSON.stringify(info)
+			}
+			const method = "POST";
+	
+			const response = await axios({
+				method:method,
+				url:url,
+				headers:headers,
+				data:json_data
+			})
+      const vehiculos_c = JSON.parse(response.data.body).response;
+      const formattedVehiculos = vehiculos_c.map(item => ({
+        placa: item.placa.S,
+        calificacion_promedio: item.calificacion_promedio.S,
+        tipo_carga: item.tipo_carga.S,
+        tipo_transporte: item.tipo_transporte.S,
+        altura: item.dimensiones.M.altura.S,
+        largo: item.dimensiones.M.largo.S,
+        ancho: item.dimensiones.M.ancho.S
+      }));
+      setVehiculitos(formattedVehiculos);
+			console.log("GET VEHICULOS_c P ",vehiculos_c);
+		} catch (error){console.log(error);}
+	};
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user && token) {
+        vehiculos();   
+      }
+    }, [user, token])  
   );
+
+  const renderVehiculoItem = ({ item }) => (
+    <VehiculoItem
+      placa={item.placa}
+      calificacion_promedio={item.calificacion_promedio}
+      tipo_carga={item.tipo_carga}
+      tipo_transporte={item.tipo_transporte}
+      altura={item.altura}
+      largo={item.largo}
+      ancho={item.ancho}
+    />
+  );
+  // return (
+  //   <SafeAreaView style={styles.safeArea}>
+  //     <View style={styles.container}>
+  //       <Text style={styles.title}>Vehiculos</Text>
+
+  //       <View style={styles.reservationsList}>
+  //         {vehiculitos.map(route => (
+  //           <VehiculoItem
+  //             placa={route.placa}
+  //             calificacion_promedio={route.calificacion_promedio}
+  //             tipo_carga={route.tipo_carga}
+  //             tipo_transporte={route.tipo_transporte}
+  //             altura={route.altura}
+  //             largo={route.largo}
+  //             ancho={route.ancho}
+  //           />
+  //         ))}
+  //       </View>    
+
+  //     </View>
+  //     <View>
+  //       <TouchableOpacity
+  //           style={styles.submitButton}
+  //           onPress={() => {
+  //             navigation.navigate('AdvVehicle');
+  //           }}
+  //         >
+  //         <Text style={styles.submitButtonText}>Registrar Vehiculo</Text>
+  //       </TouchableOpacity>
+  //   </View>
+
+  //   </SafeAreaView>
+  // );
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Vehiculos Section */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Vehiculos</Text>
-          <TouchableOpacity onPress={() => console.log('Vehiculos button pressed')}>
-            <Ionicons name="chevron-forward-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-        <FlatList
-          horizontal
-          data={[
-            { id: '1', name: 'Van', icon: require('../assets/Van.png') },
-            { id: '2', name: 'Furgoneta', icon: require('../assets/Furgoneta.png') },
-            { id: '3', name: 'Camion', icon: require('../assets/Camion.png') },
-            { id: '4', name: 'Flete', icon: require('../assets/Flete.png') },
-          ]}
-          renderItem={({ item }) => (
-            <View style={styles.carouselItem}>
-              <Image source={item.icon} style={styles.iconImage} />
-              <Text style={styles.carouselText}>{item.name}</Text>
-            </View>
-          )}
-          keyExtractor={item => item.id}
-          showsHorizontalScrollIndicator={false}
-        />
+        <Text style={styles.title}>Vehiculos</Text>
 
-        {/* Carga Section */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Carga</Text>
-          <TouchableOpacity onPress={() => console.log('Carga button pressed')}>
-            <Ionicons name="chevron-forward-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
         <FlatList
-          horizontal
-          data={[
-            { id: '1', name: 'Instrumentos', icon: require('../assets/Instrumentos.png') },
-            { id: '2', name: 'Mudanzas', icon: require('../assets/Mudanzas.png') },
-            { id: '3', name: 'Eventos', icon: require('../assets/Eventos.png') },
-            { id: '4', name: 'Fragil', icon: require('../assets/Fragil.png') },
-          ]}
-          renderItem={({ item }) => (
-            <View style={styles.carouselItem}>
-              <Image source={item.icon} style={styles.cargas} />
-              <Text style={styles.carouselText}>{item.name}</Text>
-            </View>
-          )}
-          keyExtractor={item => item.id}
-          showsHorizontalScrollIndicator={false}
+          data={vehiculitos}
+          renderItem={renderVehiculoItem}
+          keyExtractor={(item) => item.placa}
+          contentContainerStyle={styles.reservationsList}
         />
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Empresas</Text>
-          <TouchableOpacity onPress={() => console.log('Empresas button pressed')}>
-            <Ionicons name="chevron-forward-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-        <FlatList
-          horizontal
-          data={[
-            { id: '1', name: 'Empresa A' },
-            { id: '2', name: 'Empresa B' },
-            { id: '3', name: 'Empresa C' },
-            { id: '4', name: 'Empresa D' },
-          ]}
-          renderItem={({ item }) => (
-            <View style={styles.carouselItem}>
-              <Text style={styles.companyLetter}>{item.name.charAt(item.name.length - 1)}</Text>
-              <Text style={styles.carouselText}>{item.name}</Text>
-            </View>
-          )}
-          keyExtractor={item => item.id}
-          showsHorizontalScrollIndicator={false}
-        />
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Conductores</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Drivers')}>
-            <Ionicons name="chevron-forward-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-        <FlatList
-          horizontal
-          data={exampleDrivers}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          showsHorizontalScrollIndicator={false}
-        />
+      </View>
+      <View>
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={() => {
+            navigation.navigate('AdvVehicle');
+          }}
+        >
+          <Text style={styles.submitButtonText}>Registrar Vehiculo</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
+
 };
+
+const VehiculoItem = ({ placa, calificacion_promedio, tipo_carga ,tipo_transporte, altura ,largo,ancho }) => (
+    <TouchableOpacity style={styles.VehiculoItem}>
+      <Ionicons name="car-outline" size={24} color="#4A90E2" />
+      <View style={styles.reservationTextContainer}>
+        <Text style={styles.reservationText}> Placa: {placa}  </Text>
+        <Text style={styles.reservationText}> Carga: {tipo_carga}  </Text>
+        <Text style={styles.reservationText}> Transporte: {tipo_transporte}  </Text>
+        {/* <Text style={styles.reservationText}>{calificacion_promedio}</Text> */}
+      </View>
+
+    </TouchableOpacity>
+);
+
+const renderVehiculoItem = ({ item }) => (
+  <VehiculoItem
+    placa={item.placa}
+    calificacion_promedio={item.calificacion_promedio}
+    tipo_carga={item.tipo_carga}
+    tipo_transporte={item.tipo_transporte}
+    altura={item.altura}
+    largo={item.largo}
+    ancho={item.ancho}
+  />
+);
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -208,6 +175,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+    color: '#333',
   },
   sectionTitle: {
     fontSize: 18,
@@ -256,6 +231,44 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
   },
+  VehiculoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    marginHorizontal: 20,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  reservationText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  reservationTextContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  submitButton: {
+    backgroundColor: '#6B9AC4',
+    paddingVertical: 15,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginBottom: 30,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  reservationsList: {
+    marginBottom: 20,
+  }
 });
 
 export default ContactScreen;

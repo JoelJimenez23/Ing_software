@@ -50,7 +50,7 @@ const Reservations = ({ navigation }) => {
 			}
 			const method = "POST";
 	
-			response = await axios({
+			const response = await axios({
 				method:method,
 				url:url,
 				headers:headers,
@@ -122,11 +122,11 @@ const Reservations = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Tus Reservas</Text>
 
-      <TouchableOpacity style={styles.reservaButton} onPress={() => navigation.navigate('ReservationRoute')}>
+      <TouchableOpacity style={styles.reservaButton} onPress={() => navigation.navigate('Schedule')}>
         <Image source={require('../assets/Reserva.png')} style={styles.reservaIcon} />
         <View style={styles.reservaTextContainer}>
-          <Text style={styles.reservaTitle}>Reserva</Text>
-          <Text style={styles.reservaDescription}>Realiza una reserva, si necesitas un servicio a una hora específica</Text>
+          <Text style={styles.reservaTitle}>Horario</Text>
+          {/* <Text style={styles.reservaDescription}>Realiza una reserva, si necesitas un servicio a una hora específica</Text> */}
         </View>
       </TouchableOpacity>
 

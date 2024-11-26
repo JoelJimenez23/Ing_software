@@ -48,19 +48,17 @@ const UserProfile = ({ navigation }) => {
 			const user_data = JSON.parse(response.data.body).response;
       // console.log(response);
       setUser_data(user_data);
-			// console.log(user_data);
+			console.log(user_data);
 
 		} catch (error){ console.log(error) }
 	}
 	
-	
-  useFocusEffect(
-    React.useCallback(() => {
-      if (user && token) {
-        getUsersito();   
-      }
-    }, [user, token])  
-  );
+  useEffect(() => {
+    if (user && token) {
+      getUsersito();
+      console.log(user_data);
+    }
+  },[user,token]);
 
 
   return (
@@ -75,7 +73,7 @@ const UserProfile = ({ navigation }) => {
       <View style={styles.profileContainer}>
         <View style={styles.profileDetails}>
           <Text style={styles.userName}>{user_data?.nombre?.S ||"Cargando..."} {user_data?.apellido?.S}</Text>
-          <Text style={styles.userRole}>{"User"}</Text>
+          <Text style={styles.userRole}>{"Conductor"}</Text>
         </View>
         <Image source={image} style={styles.userImage} />
       </View>
@@ -85,7 +83,7 @@ const UserProfile = ({ navigation }) => {
           <Ionicons name="notifications-outline" size={20} color="#6B9AC4" />
           <Text style={styles.buttonText}>Actividad</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PaymentInfo',{user_data:user_data})}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PaymentInfo',{user_data})}>
           <Ionicons name="card-outline" size={20} color="#6B9AC4" />
           <Text style={styles.buttonText}>Pago</Text>
         </TouchableOpacity>

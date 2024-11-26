@@ -29,8 +29,8 @@ const Card = () => {
       <TouchableOpacity style={styles.cardButton} onPress={() => navigation.navigate('Contact')}>
         <Image source={require('../../assets/Van.png')} style={styles.icon} />
         <View style={styles.textContainer}>
-          <Text style={styles.buttonTitle}>Registrar Vehiculo</Text>
-          <Text style={styles.buttonSubtitle}>Registrando un nuevo vehiculo tendras nuevos clientes y atacaras otro tipo de mercados!</Text>
+          <Text style={styles.buttonTitle}>Vehiculos</Text>
+          <Text style={styles.buttonSubtitle}>Administra y registra tus vehiculos</Text>
         </View>
       </TouchableOpacity>
     </View>

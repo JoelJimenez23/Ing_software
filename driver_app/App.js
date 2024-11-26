@@ -16,6 +16,8 @@ import AddCreditCard from './screens/addCard';
 import Activity from './screens/actividad';
 import Reservations from './screens/reservation';
 import ReservationRoute from './screens/rsvRoute';
+import AdvVehicle from './screens/advVehicle';
+import Schedule from './screens/schedule';
 
 export default function App() {
 
@@ -37,6 +39,8 @@ export default function App() {
       <Stack.Screen name="Activity" component={Activity} />
       <Stack.Screen name="Reservations" component={Reservations} />
       <Stack.Screen name="ReservationRoute" component={ReservationRoute} />
+      <Stack.Screen name="AdvVehicle" component={AdvVehicle} />
+      <Stack.Screen name="Schedule" component={Schedule} />
       </Stack.Navigator>
     )
   }
