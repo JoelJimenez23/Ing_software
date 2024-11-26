@@ -58,6 +58,7 @@ const Reservations = ({ navigation }) => {
 			})
 			const reservitas = JSON.parse(response.data.body).response;
 			const formattedReservations = reservitas.map(item => ({
+        id : item.id.S,
 				placa: item.placa.S,
 				inicio: item.inicio.S,
 				llegada: item.llegada.S,
@@ -79,45 +80,6 @@ const Reservations = ({ navigation }) => {
     }, [user, token])  
   );
 
-	const get_reserva = async () => {
-		try {
-			const info = {
-				correo:user,
-				tabla:"flete_users",
-				token:token
-			};
-			const json_data = {
-				httpMethod:"GET",
-				path:"/get-reserva",
-				body: JSON.stringify(info)
-			}
-			const method = "POST";
-			response = await axios({
-				method:method,
-				url:url_1,
-				headers:headers,
-				data:json_data
-			})
-			console.log(info);
-			const reservita1 = JSON.parse(response.data.body).response;
-			console.log("RESERVITA1 ",reservita1);
-		} catch (error){console.log(error);}
-
-	};
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (user && token) {
-        get_reserva();   
-      }
-    }, [user, token])  
-  );
-
-
-
-
-
-
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Tus Reservas</Text>
@@ -133,12 +95,15 @@ const Reservations = ({ navigation }) => {
       <View style={styles.reservationsList}>
         {reservas.map(route => (
           <ReservationItem
+            key={route.id}
+            id = {route.id}
             placa={route.placa}
 						inicio={route.inicio}
             llegada={route.llegada}
             fecha={route.fecha}
 						hora={route.hora}
             estado={route.estado}
+            navigation={navigation}
           />
         ))}
       </View>
@@ -146,8 +111,8 @@ const Reservations = ({ navigation }) => {
   );
 };
 
-const ReservationItem = ({ placa, inicio, llegada ,fecha, hora ,estado }) => (
-  <TouchableOpacity style={styles.reservationItem}>
+const ReservationItem = ({ id, placa, inicio, llegada ,fecha, hora ,estado ,navigation}) => (
+  <TouchableOpacity style={styles.reservationItem} onPress={() => navigation.navigate('ShowReservaInfo',{id})}>
     <Ionicons name="calendar-outline" size={24} color="#4A90E2" />
     <View style={styles.reservationTextContainer}>
 			<Text style={styles.reservationText}>{inicio}</Text>

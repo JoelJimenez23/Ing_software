@@ -22,7 +22,7 @@ export default function BottomTab() {
           } else if (route.name === 'Reservations') {
             iconName = focused ? 'calendar' : 'calendar-outline';
           } else if (route.name === 'Contact') {
-            iconName = focused ? 'call' : 'call-outline';
+            iconName = focused ? 'car' : 'car-outline';
           } else if (route.name === 'UserProfile') {
             iconName = focused ? 'person' : 'person-outline';
           }

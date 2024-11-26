@@ -63,6 +63,7 @@ export default function Schedule( {navigation} ) {
     } catch (error) {console.log(error);}
   }
 
+  
   useEffect(() => {
       if(user && value) {
           console.log(value);
@@ -221,7 +222,7 @@ export default function Schedule( {navigation} ) {
           </View>
         </View>
 
-        <View style={styles.footer}>
+        {/* <View style={styles.footer}>
           <TouchableOpacity
             onPress={() => {
               navigation.navigate('Reservations')
@@ -231,7 +232,7 @@ export default function Schedule( {navigation} ) {
               <Text style={styles.btnText}>Reservas</Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   );

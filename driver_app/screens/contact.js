@@ -114,7 +114,6 @@ const ContactScreen = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>Vehiculos</Text>
-
         <FlatList
           data={vehiculitos}
           renderItem={renderVehiculoItem}
@@ -144,6 +143,9 @@ const VehiculoItem = ({ placa, calificacion_promedio, tipo_carga ,tipo_transport
         <Text style={styles.reservationText}> Placa: {placa}  </Text>
         <Text style={styles.reservationText}> Carga: {tipo_carga}  </Text>
         <Text style={styles.reservationText}> Transporte: {tipo_transporte}  </Text>
+        <Text style={styles.reservationText}> Altura : {altura} Largo : {largo}  Ancho : {ancho}</Text>
+
+
         {/* <Text style={styles.reservationText}>{calificacion_promedio}</Text> */}
       </View>
 

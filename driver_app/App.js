@@ -18,6 +18,10 @@ import Reservations from './screens/reservation';
 import ReservationRoute from './screens/rsvRoute';
 import AdvVehicle from './screens/advVehicle';
 import Schedule from './screens/schedule';
+import ShowReservaInfo from './screens/showReservaInfo';
+import ShowCarInfo from './screens/showCarInfo';
+import ShowViajeInfo from './screens/showViajeInfo';
+
 
 export default function App() {
 
@@ -41,6 +45,10 @@ export default function App() {
       <Stack.Screen name="ReservationRoute" component={ReservationRoute} />
       <Stack.Screen name="AdvVehicle" component={AdvVehicle} />
       <Stack.Screen name="Schedule" component={Schedule} />
+      <Stack.Screen name="ShowReservaInfo" component={ShowReservaInfo} />
+      <Stack.Screen name="ShowCarInfo" component={ShowCarInfo} />
+      <Stack.Screen name="ShowViajeInfo" component={ShowViajeInfo} />
+
       </Stack.Navigator>
     )
   }

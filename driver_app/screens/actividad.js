@@ -16,11 +16,7 @@ const headers = {
 	"Content-Type":"application/json"
 };
 
-const trips = [
-  { id: '1', date: 'Martes, 17 de septiembre, 20:00', address: 'Jr. Medrano Silva 165, Barranco', price: 'S/. 100', vehicle: 'Camion' },
-  { id: '2', date: 'Jueves, 19 de septiembre, 20:00', address: 'Jr. Medrano Silva 165, Barranco', price: 'S/. 100', vehicle: 'Flete' },
-  { id: '3', date: 'Viernes, 20 de septiembre, 20:00', address: 'Jr. Medrano Silva 165, Barranco', price: 'S/. 100', vehicle: 'Van' },
-];
+
 
 const Activity = ({ navigation }) => {
 	const [user,setUser] = useState();
