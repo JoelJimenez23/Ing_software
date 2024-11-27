@@ -42,7 +42,7 @@ export default function Schedule( {navigation} ) {
         const info = {
             fecha:moment(value).format('YYYY-MM-DD'),
             correo_driver:user, //esto se debe pasar por route params
-            estado: "solicitada"//cambiar a "acpetada"
+            estado: "aceptada"//cambiar a "acpetada"
         };
         console.log(info);
         const json_data = {
@@ -58,7 +58,9 @@ export default function Schedule( {navigation} ) {
             method:method,
             data:json_data
         });
+				//console.log(response);
         console.log("HORARIO")
+				console.log(JSON.parse(response.data.body));
         setHorario(ordenarPorHora(JSON.parse(response.data.body).response));
     } catch (error) {console.log(error);}
   }
