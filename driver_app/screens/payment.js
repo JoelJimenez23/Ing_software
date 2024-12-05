@@ -150,7 +150,7 @@ const PaymentInfo = ({ navigation,route }) => {
             }}
           >
             <View style={styles.btn}>
-              <Text style={styles.btnText}>Reservas</Text>
+              <Text style={styles.btnText}>Guardar</Text>
             </View>
           </TouchableOpacity>
         </View>

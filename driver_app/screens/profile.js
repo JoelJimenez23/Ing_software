@@ -53,12 +53,15 @@ const UserProfile = ({ navigation }) => {
 		} catch (error){ console.log(error) }
 	}
 	
-  useEffect(() => {
-    if (user && token) {
-      getUsersito();
-      console.log(user_data);
-    }
-  },[user,token]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user && token) {
+        getUsersito();
+        console.log(user_data);
+      }
+    }, [user, token])  
+  );
 
 
   return (
