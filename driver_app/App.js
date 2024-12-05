@@ -21,7 +21,8 @@ import Schedule from './screens/schedule';
 import ShowReservaInfo from './screens/showReservaInfo';
 import ShowCarInfo from './screens/showCarInfo';
 import ShowViajeInfo from './screens/showViajeInfo';
-
+import CurrentTrip from './screens/CurrentTrip';
+import MapDetails from './components/HomeMap/MapDetails';
 
 export default function App() {
 
@@ -48,7 +49,8 @@ export default function App() {
       <Stack.Screen name="ShowReservaInfo" component={ShowReservaInfo} />
       <Stack.Screen name="ShowCarInfo" component={ShowCarInfo} />
       <Stack.Screen name="ShowViajeInfo" component={ShowViajeInfo} />
-
+      <Stack.Screen name="CurrentTrip" component={CurrentTrip}/>
+      <Stack.Screen name="MapDetails" component={MapDetails}/>
       </Stack.Navigator>
     )
   }
