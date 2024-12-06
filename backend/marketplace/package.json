@@ -1,0 +1,11 @@
+{
+    "name": "marketplace",
+    "version": "1.0.0",
+    "author": "JoelJimenez23",
+    "dependencies": {
+      "@aws-sdk/client-dynamodb": "^3.470.0",
+      "express": "^4.18.2",
+      "body-parser": "^1.20.1"
+    }
+  }
+  
